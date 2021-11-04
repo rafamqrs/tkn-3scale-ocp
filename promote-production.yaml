@@ -25,11 +25,7 @@ spec:
       volumeMounts:
         - mountPath: /config
           name: 3scale-config
-      workingDir: /workspaces/$(inputs.params.context-dir)
   volumes:
     - configMap:
         name: toolbox-config
       name: 3scale-config
-  workspaces:
-    - description: The git repo will be cloned onto the volume backing this Workspace.
-      name: shared-workspace
