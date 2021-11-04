@@ -1,0 +1,58 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: application
+spec:
+  params:
+    - description: >-
+        3scale target instance. 3scale remote name from file .3scalerc.yaml or
+        "http[s]://<authentication>@3scale_domain"
+      name: destination
+      type: string
+    - description: The application
+      name: application
+      type: string
+    - description: Application's Account
+      name: appAccount
+      type: string
+    - description: The application Name
+      name: applicationName
+      type: string
+    - description: The application Description
+      name: applicationDesc
+      type: string
+    - description: The application Plan Name
+      name: applicationPlanName
+      type: string
+    - description: The Service Name
+      name: serviceName
+      type: string
+  steps:
+    - args:
+        - application
+        - apply
+        - '-c'
+        - /config/.3scalerc.yaml
+        - $(inputs.params.destination)
+        - $(inputs.params.application)
+        - '--account=$(inputs.params.appAccount)'
+        - '--name=$(inputs.params.applicationName)'
+        - '--description=$(inputs.params.applicationDesc)'
+        - '--plan=$(inputs.params.applicationPlanName)'
+        - '--service=$(inputs.params.serviceName)'
+      command:
+        - 3scale
+      image: 'registry.redhat.io/3scale-amp2/toolbox-rhel8:1.6.0-7'
+      name: application
+      resources: {}
+      volumeMounts:
+        - mountPath: /config
+          name: 3scale-config
+      workingDir: /workspaces/$(inputs.params.context-dir)
+  volumes:
+    - configMap:
+        name: toolbox-config
+      name: 3scale-config
+  workspaces:
+    - description: The source directory to be used.
+      name: shared-workspace
