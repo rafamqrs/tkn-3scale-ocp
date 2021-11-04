@@ -1,0 +1,50 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: application-plan
+spec:
+  params:
+    - description: The name of the 3scale_toolbox remote
+      name: destination
+      type: string
+    - description: The path to the source
+      name: contextDir
+      type: string
+    - description: The application plan name
+      name: planName
+      type: string
+    - description: The System Name
+      name: systemName
+      type: string
+    - description: The Service Name
+      name: serviceName
+      type: string
+  steps:
+    - args:
+        - application-plan
+        - apply
+        - '-c'
+        - /config/.3scalerc.yaml
+        - $(inputs.params.destination)
+        - $(inputs.params.serviceName)
+        - $(inputs.params.systemName)
+        - '-n'
+        - $(inputs.params.planName)
+        - '-p'
+        - '--default'
+      command:
+        - 3scale
+      image: 'registry.redhat.io/3scale-amp2/toolbox-rhel8:1.6.0-7'
+      name: application-plan
+      resources: {}
+      volumeMounts:
+        - mountPath: /config
+          name: 3scale-config
+      workingDir: /workspaces/$(inputs.params.context-dir)
+  volumes:
+    - configMap:
+        name: toolbox-config
+      name: 3scale-config
+  workspaces:
+    - description: The git repo will be cloned onto the volume backing this Workspace.
+      name: shared-workspace
