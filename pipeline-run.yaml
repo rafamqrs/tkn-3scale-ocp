@@ -1,0 +1,598 @@
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  annotations:
+    pipeline.openshift.io/started-by: opentlc-mgr
+  selfLink: >-
+    /apis/tekton.dev/v1beta1/namespaces/camel-quarkus-openapi/pipelineruns/3scale-pipeline-new-uxdozi
+  resourceVersion: '4985731'
+  name: 3scale-pipeline-new-uxdozi
+  uid: 58af141d-075e-4dfb-b75d-ea8806066ee0
+  creationTimestamp: '2021-11-04T03:48:14Z'
+  generation: 1
+  managedFields:
+    - apiVersion: tekton.dev/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:metadata':
+          'f:annotations':
+            .: {}
+            'f:pipeline.openshift.io/started-by': {}
+          'f:labels':
+            .: {}
+            'f:tekton.dev/pipeline': {}
+        'f:spec':
+          .: {}
+          'f:params': {}
+          'f:pipelineRef':
+            .: {}
+            'f:name': {}
+          'f:resources': {}
+          'f:status': {}
+          'f:workspaces': {}
+      manager: Mozilla
+      operation: Update
+      time: '2021-11-04T03:48:14Z'
+    - apiVersion: tekton.dev/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:status':
+          .: {}
+          'f:completionTime': {}
+          'f:conditions': {}
+          'f:pipelineSpec':
+            .: {}
+            'f:params': {}
+            'f:resources': {}
+            'f:tasks': {}
+            'f:workspaces': {}
+          'f:startTime': {}
+          'f:taskRuns':
+            .: {}
+            'f:3scale-pipeline-new-uxdozi-application-hndfr':
+              .: {}
+              'f:pipelineTaskName': {}
+              'f:status':
+                .: {}
+                'f:completionTime': {}
+                'f:conditions': {}
+                'f:podName': {}
+                'f:startTime': {}
+                'f:steps': {}
+                'f:taskSpec':
+                  .: {}
+                  'f:params': {}
+                  'f:steps': {}
+                  'f:volumes': {}
+                  'f:workspaces': {}
+            'f:3scale-pipeline-new-uxdozi-application-plan-g2ljq':
+              .: {}
+              'f:pipelineTaskName': {}
+              'f:status':
+                .: {}
+                'f:completionTime': {}
+                'f:conditions': {}
+                'f:podName': {}
+                'f:startTime': {}
+                'f:steps': {}
+                'f:taskSpec':
+                  .: {}
+                  'f:params': {}
+                  'f:steps': {}
+                  'f:volumes': {}
+                  'f:workspaces': {}
+            'f:3scale-pipeline-new-uxdozi-import-openapi-zxnsl':
+              .: {}
+              'f:pipelineTaskName': {}
+              'f:status':
+                .: {}
+                'f:completionTime': {}
+                'f:conditions': {}
+                'f:podName': {}
+                'f:resourcesResult': {}
+                'f:startTime': {}
+                'f:steps': {}
+                'f:taskSpec':
+                  .: {}
+                  'f:params': {}
+                  'f:resources':
+                    .: {}
+                    'f:inputs': {}
+                  'f:steps': {}
+                  'f:volumes': {}
+                  'f:workspaces': {}
+            'f:3scale-pipeline-new-uxdozi-promote-production-kpv8r':
+              .: {}
+              'f:pipelineTaskName': {}
+              'f:status':
+                .: {}
+                'f:completionTime': {}
+                'f:conditions': {}
+                'f:podName': {}
+                'f:startTime': {}
+                'f:steps': {}
+                'f:taskSpec':
+                  .: {}
+                  'f:params': {}
+                  'f:steps': {}
+                  'f:volumes': {}
+      manager: openshift-pipelines-controller
+      operation: Update
+      time: '2021-11-04T03:48:59Z'
+  namespace: camel-quarkus-openapi
+  labels:
+    tekton.dev/pipeline: 3scale-pipeline-new
+spec:
+  params:
+    - name: APP_NAME
+      value: camel-quarkus-openapi-git
+    - name: GIT_REPO
+      value: 'https://github.com/rafamqrs/camel-quarkus-openapi.git'
+    - name: GIT_REVISION
+      value: main
+  pipelineRef:
+    name: 3scale-pipeline-new
+  resources:
+    - name: camel-quarkus-api-git-resource
+      resourceRef:
+        name: camel-quarkus-api-git-resource
+  serviceAccountName: pipeline
+  timeout: 1h0m0s
+  workspaces:
+    - name: shared-workspace
+      persistentVolumeClaim:
+        claimName: 3scale-pipeline
+status:
+  completionTime: '2021-11-04T03:48:59Z'
+  conditions:
+    - lastTransitionTime: '2021-11-04T03:48:59Z'
+      message: 'Tasks Completed: 4 (Failed: 0, Cancelled 0), Skipped: 0'
+      reason: Succeeded
+      status: 'True'
+      type: Succeeded
+  pipelineSpec:
+    params:
+      - default: camel-quarkus-openapi-git
+        name: APP_NAME
+        type: string
+      - default: 'https://github.com/rafamqrs/camel-quarkus-openapi.git'
+        name: GIT_REPO
+        type: string
+      - default: main
+        name: GIT_REVISION
+        type: string
+    resources:
+      - name: camel-quarkus-api-git-resource
+        type: git
+    tasks:
+      - name: import-openapi
+        params:
+          - name: pathToOpenAPI
+            value: swagger.json
+          - name: destination
+            value: 3scale28
+          - name: privateBaseURL
+            value: 'http://backend-listener.rh-3scale.svc.cluster.local:3000'
+          - name: systemName
+            value: api
+        resources:
+          inputs:
+            - name: camel-quarkus-openapi-git-resource
+              resource: camel-quarkus-api-git-resource
+        taskRef:
+          kind: Task
+          name: import-openapi
+        workspaces:
+          - name: shared-workspace
+            workspace: shared-workspace
+      - name: application-plan
+        params:
+          - name: destination
+            value: 3scale28
+          - name: contextDir
+            value: shared-workspace
+          - name: planName
+            value: Camel Padrao
+          - name: systemName
+            value: camelquarkus
+          - name: serviceName
+            value: api
+        runAfter:
+          - import-openapi
+        taskRef:
+          kind: Task
+          name: application-plan
+        workspaces:
+          - name: shared-workspace
+            workspace: shared-workspace
+      - name: application
+        params:
+          - name: destination
+            value: 3scale28
+          - name: application
+            value: camel_quarkus_app
+          - name: appAccount
+            value: test-user
+          - name: applicationName
+            value: Camel Quarkus OpenApi
+          - name: applicationDesc
+            value: Created from TKN_TOOLBOX
+          - name: applicationPlanName
+            value: camelquarkus
+          - name: serviceName
+            value: api
+        runAfter:
+          - application-plan
+        taskRef:
+          kind: Task
+          name: application
+        workspaces:
+          - name: shared-workspace
+            workspace: shared-workspace
+      - name: promote-production
+        params:
+          - name: remote
+            value: 3scale28
+          - name: service
+            value: api
+        runAfter:
+          - application
+        taskRef:
+          kind: Task
+          name: promote-production
+    workspaces:
+      - name: shared-workspace
+  startTime: '2021-11-04T03:48:14Z'
+  taskRuns:
+    3scale-pipeline-new-uxdozi-application-hndfr:
+      pipelineTaskName: application
+      status:
+        completionTime: '2021-11-04T03:48:52Z'
+        conditions:
+          - lastTransitionTime: '2021-11-04T03:48:52Z'
+            message: All Steps have completed executing
+            reason: Succeeded
+            status: 'True'
+            type: Succeeded
+        podName: 3scale-pipeline-new-uxdozi-application-hndfr-pod-g974s
+        startTime: '2021-11-04T03:48:43Z'
+        steps:
+          - container: step-application
+            imageID: >-
+              registry.redhat.io/3scale-amp2/toolbox-rhel8@sha256:b0ae9d2de17dc5f2f05d091ae7569ee9268b514f0f96f09d4ebe3d71ccd3ee16
+            name: application
+            terminated:
+              containerID: >-
+                cri-o://a380ccee420842060960d4102a02956dac8a3ae5098933a5dc067cbdbd181435
+              exitCode: 0
+              finishedAt: '2021-11-04T03:48:52Z'
+              reason: Completed
+              startedAt: '2021-11-04T03:48:50Z'
+        taskSpec:
+          params:
+            - description: >-
+                3scale target instance. 3scale remote name from file
+                .3scalerc.yaml or "http[s]://<authentication>@3scale_domain"
+              name: destination
+              type: string
+            - description: The application
+              name: application
+              type: string
+            - description: Application's Account
+              name: appAccount
+              type: string
+            - description: The application Name
+              name: applicationName
+              type: string
+            - description: The application Description
+              name: applicationDesc
+              type: string
+            - description: The application Plan Name
+              name: applicationPlanName
+              type: string
+            - description: The Service Name
+              name: serviceName
+              type: string
+          steps:
+            - args:
+                - application
+                - apply
+                - '-c'
+                - /config/.3scalerc.yaml
+                - $(inputs.params.destination)
+                - $(inputs.params.application)
+                - '--account=$(inputs.params.appAccount)'
+                - '--name=$(inputs.params.applicationName)'
+                - '--description=$(inputs.params.applicationDesc)'
+                - '--plan=$(inputs.params.applicationPlanName)'
+                - '--service=$(inputs.params.serviceName)'
+              command:
+                - 3scale
+              image: 'registry.redhat.io/3scale-amp2/toolbox-rhel8:1.6.0-7'
+              name: application
+              resources: {}
+              volumeMounts:
+                - mountPath: /config
+                  name: 3scale-config
+              workingDir: /workspaces/$(inputs.params.context-dir)
+          volumes:
+            - configMap:
+                name: toolbox-config
+              name: 3scale-config
+          workspaces:
+            - description: The source directory to be used.
+              name: shared-workspace
+    3scale-pipeline-new-uxdozi-application-plan-g2ljq:
+      pipelineTaskName: application-plan
+      status:
+        completionTime: '2021-11-04T03:48:43Z'
+        conditions:
+          - lastTransitionTime: '2021-11-04T03:48:43Z'
+            message: All Steps have completed executing
+            reason: Succeeded
+            status: 'True'
+            type: Succeeded
+        podName: 3scale-pipeline-new-uxdozi-application-plan-g2ljq-pod-nx678
+        startTime: '2021-11-04T03:48:33Z'
+        steps:
+          - container: step-ls-build-sources
+            imageID: >-
+              docker.io/library/busybox@sha256:549df9c38395174a9266be63b971ccb51ee017abf7335e024ad0d99c498f12b8
+            name: ls-build-sources
+            terminated:
+              containerID: >-
+                cri-o://42dd3074707c304c9e72c4227b752652e9f0d6e237c52ab17ca00f19358baba9
+              exitCode: 0
+              finishedAt: '2021-11-04T03:48:41Z'
+              reason: Completed
+              startedAt: '2021-11-04T03:48:41Z'
+          - container: step-application-plan
+            imageID: >-
+              registry.redhat.io/3scale-amp2/toolbox-rhel8@sha256:b0ae9d2de17dc5f2f05d091ae7569ee9268b514f0f96f09d4ebe3d71ccd3ee16
+            name: application-plan
+            terminated:
+              containerID: >-
+                cri-o://38af1d0cb56dd0d8119be84ae0545c16008b5b821bb7455577f9a86522d225ff
+              exitCode: 0
+              finishedAt: '2021-11-04T03:48:42Z'
+              reason: Completed
+              startedAt: '2021-11-04T03:48:41Z'
+        taskSpec:
+          params:
+            - description: The name of the 3scale_toolbox remote
+              name: destination
+              type: string
+            - description: The path to the source
+              name: contextDir
+              type: string
+            - description: The application plan name
+              name: planName
+              type: string
+            - description: The System Name
+              name: systemName
+              type: string
+            - description: The Service Name
+              name: serviceName
+              type: string
+          steps:
+            - command:
+                - ls
+                - '-ltra'
+                - /config
+              image: busybox
+              name: ls-build-sources
+              resources: {}
+              volumeMounts:
+                - mountPath: /config
+                  name: 3scale-config
+              workingDir: /workspace/$(inputs.params.contextDir)
+            - args:
+                - application-plan
+                - apply
+                - '-c'
+                - /config/.3scalerc.yaml
+                - $(inputs.params.destination)
+                - $(inputs.params.serviceName)
+                - $(inputs.params.systemName)
+                - '-n'
+                - $(inputs.params.planName)
+                - '-p'
+                - '--default'
+              command:
+                - 3scale
+              image: 'registry.redhat.io/3scale-amp2/toolbox-rhel8:1.6.0-7'
+              name: application-plan
+              resources: {}
+              volumeMounts:
+                - mountPath: /config
+                  name: 3scale-config
+              workingDir: /workspaces/$(inputs.params.context-dir)
+          volumes:
+            - configMap:
+                name: toolbox-config
+              name: 3scale-config
+          workspaces:
+            - description: >-
+                The git repo will be cloned onto the volume backing this
+                Workspace.
+              name: shared-workspace
+    3scale-pipeline-new-uxdozi-import-openapi-zxnsl:
+      pipelineTaskName: import-openapi
+      status:
+        completionTime: '2021-11-04T03:48:32Z'
+        conditions:
+          - lastTransitionTime: '2021-11-04T03:48:32Z'
+            message: All Steps have completed executing
+            reason: Succeeded
+            status: 'True'
+            type: Succeeded
+        podName: 3scale-pipeline-new-uxdozi-import-openapi-zxnsl-pod-mn2sb
+        resourcesResult:
+          - key: commit
+            resourceName: camel-quarkus-openapi-git-resource
+            resourceRef:
+              name: camel-quarkus-openapi-git-resource
+            value: 7642c6c17b6c6cdab40832d471df309a4f490658
+          - key: url
+            resourceName: camel-quarkus-openapi-git-resource
+            resourceRef:
+              name: camel-quarkus-openapi-git-resource
+            value: 'https://github.com/rafamqrs/camel-quarkus-openapi.git'
+        startTime: '2021-11-04T03:48:14Z'
+        steps:
+          - container: step-git-source-camel-quarkus-openapi-git-resource-s8r4x
+            imageID: >-
+              registry.redhat.io/openshift-pipelines/pipelines-git-init-rhel8@sha256:73a433de8fa290807559ba341696b3b192949d3d8690259de4a465551c8ef627
+            name: git-source-camel-quarkus-openapi-git-resource-s8r4x
+            terminated:
+              containerID: >-
+                cri-o://18061af23af3cd4300de1d83bb3846f4e2635ff16bbf9542adf8935d4cd80405
+              exitCode: 0
+              finishedAt: '2021-11-04T03:48:28Z'
+              message: >-
+                [{"key":"commit","value":"7642c6c17b6c6cdab40832d471df309a4f490658","resourceName":"camel-quarkus-openapi-git-resource","resourceRef":{"name":"camel-quarkus-openapi-git-resource"}},{"key":"url","value":"https://github.com/rafamqrs/camel-quarkus-openapi.git","resourceName":"camel-quarkus-openapi-git-resource","resourceRef":{"name":"camel-quarkus-openapi-git-resource"}}]
+              reason: Completed
+              startedAt: '2021-11-04T03:48:28Z'
+          - container: step-ls-build-sources
+            imageID: >-
+              docker.io/library/busybox@sha256:549df9c38395174a9266be63b971ccb51ee017abf7335e024ad0d99c498f12b8
+            name: ls-build-sources
+            terminated:
+              containerID: >-
+                cri-o://6d4b24b9908b89846da7342fc4ed1fe51239e268a933892951cc8de4e771279f
+              exitCode: 0
+              finishedAt: '2021-11-04T03:48:29Z'
+              reason: Completed
+              startedAt: '2021-11-04T03:48:29Z'
+          - container: step-import-openapi
+            imageID: >-
+              registry.redhat.io/3scale-amp2/toolbox-rhel8@sha256:b0ae9d2de17dc5f2f05d091ae7569ee9268b514f0f96f09d4ebe3d71ccd3ee16
+            name: import-openapi
+            terminated:
+              containerID: >-
+                cri-o://95ae89007f239dec981372d8305d0af9096c824815579c29ae0321a4eee9fef6
+              exitCode: 0
+              finishedAt: '2021-11-04T03:48:31Z'
+              reason: Completed
+              startedAt: '2021-11-04T03:48:29Z'
+        taskSpec:
+          params:
+            - default: camel-quarkus-openapi-git-resource
+              description: The path to the source
+              name: contextDir
+              type: string
+            - default: swagger.json
+              description: The path to the dockerfile to build
+              name: pathToOpenAPI
+              type: string
+            - default: 3scale28
+              description: The name of the 3scale_toolbox remote
+              name: destination
+              type: string
+            - default: 'http://backend-listener.rh-3scale.svc.cluster.local:3000'
+              description: The URL of the API Backend
+              name: privateBaseURL
+              type: string
+            - default: api
+              description: The system_name of the service to create
+              name: systemName
+              type: string
+          resources:
+            inputs:
+              - name: camel-quarkus-openapi-git-resource
+                type: git
+          steps:
+            - command:
+                - ls
+                - '-ltra'
+                - /config
+              image: busybox
+              name: ls-build-sources
+              resources: {}
+              volumeMounts:
+                - mountPath: /config
+                  name: 3scale-config
+              workingDir: /workspace/$(inputs.params.contextDir)
+            - args:
+                - import
+                - openapi
+                - '-c'
+                - /config/.3scalerc.yaml
+                - '-d'
+                - $(inputs.params.destination)
+                - >-
+                  /workspace/$(inputs.params.contextDir)/$(inputs.params.pathToOpenAPI)
+                - '--override-private-base-url=$(inputs.params.privateBaseURL)'
+                - '--target_system_name=$(inputs.params.systemName)'
+              command:
+                - 3scale
+              image: 'registry.redhat.io/3scale-amp2/toolbox-rhel8:1.6.0-7'
+              name: import-openapi
+              resources: {}
+              volumeMounts:
+                - mountPath: /config
+                  name: 3scale-config
+              workingDir: /workspaces/$(inputs.params.context-dir)
+          volumes:
+            - configMap:
+                name: toolbox-config
+              name: 3scale-config
+          workspaces:
+            - description: >-
+                The git repo will be cloned onto the volume backing this
+                Workspace.
+              name: shared-workspace
+    3scale-pipeline-new-uxdozi-promote-production-kpv8r:
+      pipelineTaskName: promote-production
+      status:
+        completionTime: '2021-11-04T03:48:59Z'
+        conditions:
+          - lastTransitionTime: '2021-11-04T03:48:59Z'
+            message: All Steps have completed executing
+            reason: Succeeded
+            status: 'True'
+            type: Succeeded
+        podName: 3scale-pipeline-new-uxdozi-promote-production-kpv8r-pod-fk6rd
+        startTime: '2021-11-04T03:48:53Z'
+        steps:
+          - container: step-promote-production
+            imageID: >-
+              registry.redhat.io/3scale-amp2/toolbox-rhel8@sha256:b0ae9d2de17dc5f2f05d091ae7569ee9268b514f0f96f09d4ebe3d71ccd3ee16
+            name: promote-production
+            terminated:
+              containerID: >-
+                cri-o://38fd0c5e3c2baf76fd9a435a920b339fd6e00a04f2db049813f5718cd7147e66
+              exitCode: 0
+              finishedAt: '2021-11-04T03:48:59Z'
+              reason: Completed
+              startedAt: '2021-11-04T03:48:57Z'
+        taskSpec:
+          params:
+            - description: >-
+                3scale target instance. 3scale remote name from file
+                .3scalerc.yaml or "http[s]://<authentication>@3scale_domain"
+              name: remote
+              type: string
+            - description: The service name
+              name: service
+              type: string
+          steps:
+            - args:
+                - proxy-config
+                - promote
+                - '-c'
+                - /config/.3scalerc.yaml
+                - $(inputs.params.remote)
+                - $(inputs.params.service)
+              command:
+                - 3scale
+              image: 'registry.redhat.io/3scale-amp2/toolbox-rhel8:1.6.0-7'
+              name: promote-production
+              resources: {}
+              volumeMounts:
+                - mountPath: /config
+                  name: 3scale-config
+          volumes:
+            - configMap:
+                name: toolbox-config
+              name: 3scale-config
