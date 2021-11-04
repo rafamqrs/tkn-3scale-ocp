@@ -1,0 +1,116 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  creationTimestamp: '2021-11-03T16:31:38Z'
+  generation: 10
+  managedFields:
+    - apiVersion: tekton.dev/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        'f:spec':
+          .: {}
+          'f:params': {}
+          'f:resources': {}
+          'f:tasks': {}
+          'f:workspaces': {}
+      manager: Mozilla
+      operation: Update
+      time: '2021-11-03T16:31:38Z'
+  name: 3scale-pipeline-new
+  namespace: camel-quarkus-openapi
+  resourceVersion: '4981797'
+  selfLink: >-
+    /apis/tekton.dev/v1beta1/namespaces/camel-quarkus-openapi/pipelines/3scale-pipeline-new
+  uid: b89c4054-fc1a-44b7-8131-44d8d3c45b3d
+spec:
+  params:
+    - default: camel-quarkus-openapi-git
+      name: APP_NAME
+      type: string
+    - default: 'https://github.com/rafamqrs/camel-quarkus-openapi.git'
+      name: GIT_REPO
+      type: string
+    - default: main
+      name: GIT_REVISION
+      type: string
+  resources:
+    - name: camel-quarkus-api-git-resource
+      type: git
+  tasks:
+    - name: import-openapi
+      params:
+        - name: pathToOpenAPI
+          value: swagger.json
+        - name: destination
+          value: 3scale28
+        - name: privateBaseURL
+          value: 'http://backend-listener.rh-3scale.svc.cluster.local:3000'
+        - name: systemName
+          value: api
+      resources:
+        inputs:
+          - name: camel-quarkus-openapi-git-resource
+            resource: camel-quarkus-api-git-resource
+      taskRef:
+        kind: Task
+        name: import-openapi
+      workspaces:
+        - name: shared-workspace
+          workspace: shared-workspace
+    - name: application-plan
+      params:
+        - name: destination
+          value: 3scale28
+        - name: contextDir
+          value: shared-workspace
+        - name: planName
+          value: Camel Padrao
+        - name: systemName
+          value: camelquarkus
+        - name: serviceName
+          value: api
+      runAfter:
+        - import-openapi
+      taskRef:
+        kind: Task
+        name: application-plan
+      workspaces:
+        - name: shared-workspace
+          workspace: shared-workspace
+    - name: application
+      params:
+        - name: destination
+          value: 3scale28
+        - name: application
+          value: camel_quarkus_app
+        - name: appAccount
+          value: test-user
+        - name: applicationName
+          value: Camel Quarkus OpenApi
+        - name: applicationDesc
+          value: Created from TKN_TOOLBOX
+        - name: applicationPlanName
+          value: camelquarkus
+        - name: serviceName
+          value: api
+      runAfter:
+        - application-plan
+      taskRef:
+        kind: Task
+        name: application
+      workspaces:
+        - name: shared-workspace
+          workspace: shared-workspace
+    - name: promote-production
+      params:
+        - name: remote
+          value: 3scale28
+        - name: service
+          value: api
+      runAfter:
+        - application
+      taskRef:
+        kind: Task
+        name: promote-production
+  workspaces:
+    - name: shared-workspace
