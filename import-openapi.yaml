@@ -1,0 +1,48 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: import-openapi
+spec:
+  params:
+    - description: The path to the source
+      name: contextDir
+      type: string
+    - description: The path to the dockerfile to build
+      name: pathToOpenAPI
+      type: string
+    - description: The name of the 3scale_toolbox remote
+      name: destination
+      type: string
+    - description: The URL of the API Backend, ex "http://backend-listener.rh-3scale.svc.cluster.local:3000"
+      name: privateBaseURL
+      type: string
+    - description: The system_name of the service to create
+      name: systemName
+      type: string
+  steps:
+    - args:
+        - import
+        - openapi
+        - '-c'
+        - /config/.3scalerc.yaml
+        - '-d'
+        - $(inputs.params.destination)
+        - /workspace/$(inputs.params.contextDir)/$(inputs.params.pathToOpenAPI)
+        - '--override-private-base-url=$(inputs.params.privateBaseURL)'
+        - '--target_system_name=$(inputs.params.systemName)'
+      command:
+        - 3scale
+      image: 'registry.redhat.io/3scale-amp2/toolbox-rhel8:1.6.0-7'
+      name: import-openapi
+      resources: {}
+      volumeMounts:
+        - mountPath: /config
+          name: 3scale-config
+      workingDir: /workspaces/$(inputs.params.context-dir)
+  volumes:
+    - configMap:
+        name: toolbox-config
+      name: 3scale-config
+  workspaces:
+    - description: The git repo will be cloned onto the volume backing this Workspace.
+      name: shared-workspace
