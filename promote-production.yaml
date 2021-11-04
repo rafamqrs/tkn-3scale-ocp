@@ -1,0 +1,35 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: promote-production
+spec:
+  params:
+    - description: 3scale target instance. 3scale remote name from file .3scalerc.yaml or "http[s]://<authentication>@3scale_domain"
+      name: remote
+      type: string
+    - description: The service name
+      name: service
+      type: string
+  steps:
+    - name: promote-production
+      image: 'registry.redhat.io/3scale-amp2/toolbox-rhel8:1.6.0-7'
+      command:
+        - 3scale
+      args:
+        - proxy-config
+        - promote
+        - '-c'
+        - /config/.3scalerc.yaml
+        - $(inputs.params.remote)
+        - $(inputs.params.service)
+      volumeMounts:
+        - mountPath: /config
+          name: 3scale-config
+      workingDir: /workspaces/$(inputs.params.context-dir)
+  volumes:
+    - configMap:
+        name: toolbox-config
+      name: 3scale-config
+  workspaces:
+    - description: The git repo will be cloned onto the volume backing this Workspace.
+      name: shared-workspace
