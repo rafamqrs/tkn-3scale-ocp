@@ -1,0 +1,11 @@
+apiVersion: tekton.dev/v1alpha1
+kind: PipelineResource
+metadata:
+  name: camel-quarkus-api-git-resource
+spec:
+  params:
+    - name: url
+      value: 'https://github.com/rafamqrs/camel-quarkus-openapi.git'
+    - name: revision
+      value: main
+  type: git
